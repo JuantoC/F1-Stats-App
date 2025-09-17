@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 
-import laps from "./routes/laps.js"; 
+import results from "./routes/results.js"; 
 
 dotenv.config();
 
@@ -10,10 +10,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use("/laps", laps);
+app.use("/results", results);
 
 app.get("/health", (req, res) => {
   res.send("OK");
+  console.log(req.query);
 });
 
 app.listen(PORT, () => {
