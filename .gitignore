@@ -1,2 +1,7 @@
-processes/sample_data/.env
-/processes/sample_data/node_modules
+**/.DS_Store
+**/node_modules/
+**/.env
+
+# React Router
+client/.react-router/
+client/build/
