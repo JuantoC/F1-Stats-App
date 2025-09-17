@@ -15,6 +15,18 @@ router.get("/", async (req, res) => {
         conditions.push('id = ?');
         values.push(id)
     }
+    if(race_id && race_id != ""){
+        conditions.push('race_id = ?');
+        values.push(race_id)
+    }
+    if(car_racer_id && car_racer_id != ""){
+        conditions.push('car_racer_id = ?');
+        values.push(car_racer_id)
+    }
+    if(car_manufacturer_id && car_manufacturer_id != ""){
+        conditions.push('car_manufacturer_id = ?');
+        values.push(car_manufacturer_id)
+    }
 
     if(conditions.length > 0){
         query += ' WHERE ' + conditions.join(' AND ')
