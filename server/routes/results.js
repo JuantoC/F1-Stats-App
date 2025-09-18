@@ -2,11 +2,12 @@ import express from "express";
 import pool from "../helpers/db.js";
 
 const router = express.Router();
+const PAGINATION_SIZE = 5;
 
 router.get("/", async (req, res) => {
     try {
         let query = 'select * from results r join laps l on r.id = l.result_id';
-        const { id, race_id, car_racer_id, car_manufacturer_id } = req.query;
+        const { id, race_id, car_racer_id, car_manufacturer_id, order, sort, page = 1 } = req.query;
         const conditions = [];
         const values = [];
 
@@ -30,9 +31,23 @@ router.get("/", async (req, res) => {
             values.push(car_manufacturer_id)
         }
 
-        if(conditions.length > 0){
+        if (conditions.length > 0) {
             query += ' WHERE ' + conditions.join(' AND ')
         }
+
+        if (order) {
+            if (order.toLowerCase() === 'time') {
+                query += ' order by r.time'
+            }
+            if (order.toLowerCase() === 'id') {
+                query += ' order by r.id'
+            }
+            if (sort === 'asc') {
+                query += ' asc'
+            } else query += ' desc'
+        }
+
+        query += ' limit ' + ((page - 1) * PAGINATION_SIZE) + ',' + PAGINATION_SIZE
         const [result] = await pool.query(query, values);
         res.json(result);
     }
