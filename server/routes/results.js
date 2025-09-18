@@ -5,38 +5,94 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
     try {
-        let query = 'select * from results r join laps l on r.id = l.result_id';
+        // Base query joining all related tables
+        let query = `
+            SELECT 
+                r.*, 
+                lr.id AS lap_id, lr.time AS lap_time, lr.pos AS lap_pos,
+                rc.id AS racer_id, rc.name AS racer_name, rc.age AS racer_age, rc.country AS racer_country,
+                rm.id AS manufacturer_id, rm.name AS manufacturer_name, rm.country AS manufacturer_country,
+                ra.id AS race_id, ra.date_start AS race_date_start,
+                t.id AS track_id, t.name AS track_name, t.country AS track_country, t.length AS track_length
+            FROM results r
+            LEFT JOIN laps lr ON r.id = lr.result_id
+            LEFT JOIN car_racers rc ON r.car_racer_id = rc.id
+            LEFT JOIN car_manufacturer rm ON r.car_manufacturer_id = rm.id
+            LEFT JOIN races ra ON r.race_id = ra.id
+            LEFT JOIN tracks t ON ra.track_id = t.id
+        `;
+
         const { id, race_id, car_racer_id, car_manufacturer_id } = req.query;
         const conditions = [];
         const values = [];
 
-        if (id && id != "") {
+        if (id && id.trim() !== "") {
             conditions.push('r.id = ?');
-            values.push(id)
+            values.push(id);
         }
-
-        if (race_id && race_id != "") {
+        if (race_id && race_id.trim() !== "") {
             conditions.push('r.race_id = ?');
-            values.push(race_id)
+            values.push(race_id);
         }
-
-        if (car_racer_id && car_racer_id != "") {
+        if (car_racer_id && car_racer_id.trim() !== "") {
             conditions.push('r.car_racer_id = ?');
-            values.push(car_racer_id)
+            values.push(car_racer_id);
         }
-
-        if (car_manufacturer_id && car_manufacturer_id != "") {
+        if (car_manufacturer_id && car_manufacturer_id.trim() !== "") {
             conditions.push('r.car_manufacturer_id = ?');
-            values.push(car_manufacturer_id)
+            values.push(car_manufacturer_id);
         }
 
-        if(conditions.length > 0){
-            query += ' WHERE ' + conditions.join(' AND ')
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
         }
-        const [result] = await pool.query(query, values);
-        res.json(result);
-    }
-    catch (error) {
+
+        const [rows] = await pool.query(query, values);
+
+        const resultsMap = {};
+        rows.forEach(row => {
+            if (!resultsMap[row.id]) {
+                resultsMap[row.id] = {
+                    id: row.id,
+                    time: row.time,
+                    pos_starter: row.pos_starter,
+                    pos_finisher: row.pos_finisher,
+                    racer: {
+                        id: row.racer_id,
+                        name: row.racer_name,
+                        age: row.racer_age,
+                        country: row.racer_country
+                    },
+                    manufacturer: {
+                        id: row.manufacturer_id,
+                        name: row.manufacturer_name,
+                        country: row.manufacturer_country
+                    },
+                    race: {
+                        id: row.race_id,
+                        date_start: row.race_date_start,
+                        track: {
+                            id: row.track_id,
+                            name: row.track_name,
+                            country: row.track_country,
+                            length: row.track_length
+                        }
+                    },
+                    laps: []
+                };
+            }
+
+            if (row.lap_id) {
+                resultsMap[row.id].laps.push({
+                    id: row.lap_id,
+                    time: row.lap_time,
+                    pos: row.lap_pos
+                });
+            }
+        });
+
+        res.json(Object.values(resultsMap));
+    } catch (error) {
         console.error(error);
         res.status(500).send("Server error");
     }

@@ -21,7 +21,6 @@ app.use("/tracks", tracks);
 
 app.get("/health", (req, res) => {
   res.send("OK");
-  console.log(req.query);
 });
 
 app.listen(PORT, () => {
