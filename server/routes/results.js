@@ -1,7 +1,5 @@
 import express from "express";
-import mysql from "mysql2/promise";
 import pool from "../helpers/db.js";
-
 
 const router = express.Router();
 
@@ -36,7 +34,6 @@ router.get("/", async (req, res) => {
             query += ' WHERE ' + conditions.join(' AND ')
         }
         const [result] = await pool.query(query, values);
-        console.log(query)
         res.json(result);
     }
     catch (error) {
