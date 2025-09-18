@@ -2,10 +2,10 @@ import express from "express";
 import pool from "../helpers/db.js";
 
 const router = express.Router();
+const PAGINATION_SIZE = 5;
 
 router.get("/", async (req, res) => {
     try {
-        // Base query joining all related tables
         let query = `
             SELECT 
                 r.*, 
@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
             LEFT JOIN tracks t ON ra.track_id = t.id
         `;
 
-        const { id, race_id, car_racer_id, car_manufacturer_id } = req.query;
+        const { id, race_id, car_racer_id, car_manufacturer_id, order, sort, page = 1 } = req.query;
         const conditions = [];
         const values = [];
 
@@ -47,6 +47,20 @@ router.get("/", async (req, res) => {
             query += ' WHERE ' + conditions.join(' AND ');
         }
 
+
+        if (order) {
+            if (order.toLowerCase() === 'time') {
+                query += ' order by r.time'
+            }
+            if (order.toLowerCase() === 'id') {
+                query += ' order by r.id'
+            }
+            if (sort === 'asc') {
+                query += ' asc'
+            } else query += ' desc'
+        }
+
+        query += ' limit ' + ((page - 1) * PAGINATION_SIZE) + ',' + PAGINATION_SIZE
         const [rows] = await pool.query(query, values);
 
         const resultsMap = {};
