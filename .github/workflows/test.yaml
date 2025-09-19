@@ -12,8 +12,11 @@ on:
 
 jobs:
   test:
+    defaults:
+      run:
+        working-directory: server
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
