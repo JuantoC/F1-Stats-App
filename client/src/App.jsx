@@ -2,7 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import OrderList from './List'
+import CarRacersList from './ListCarRacers'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,7 +22,7 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           Click is {count}
         </button>
-        <OrderList/>
+        <CarRacersList limit={count}/>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
