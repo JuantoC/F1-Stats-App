@@ -25,6 +25,6 @@ app.get("/health", (req, res) => {
   res.send("OK");
 });
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
