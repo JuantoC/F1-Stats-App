@@ -4,25 +4,24 @@ import pool from "../helpers/db.js";
 const router = express.Router();
 const PAGINATION_SIZE = 5;
 
-router.get("/", async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         let query = `
             SELECT 
                 r.*, 
-                lr.id AS lap_id, lr.time AS lap_time, lr.pos AS lap_pos,
                 rc.id AS racer_id, rc.name AS racer_name, rc.age AS racer_age, rc.country AS racer_country,
                 rm.id AS manufacturer_id, rm.name AS manufacturer_name, rm.country AS manufacturer_country,
                 ra.id AS race_id, ra.date_start AS race_date_start,
                 t.id AS track_id, t.name AS track_name, t.country AS track_country, t.length AS track_length
             FROM results r
-            LEFT JOIN laps lr ON r.id = lr.result_id
             LEFT JOIN car_racers rc ON r.car_racer_id = rc.id
             LEFT JOIN car_manufacturer rm ON r.car_manufacturer_id = rm.id
             LEFT JOIN races ra ON r.race_id = ra.id
             LEFT JOIN tracks t ON ra.track_id = t.id
         `;
 
-        const { id, race_id, car_racer_id, car_manufacturer_id, order, sort, page = 1 } = req.query;
+        const { race_id, car_racer_id, car_manufacturer_id, order, sort, page = 1 } = req.query;
+        const { id } = req.params;
         const conditions = [];
         const values = [];
 
@@ -47,7 +46,6 @@ router.get("/", async (req, res) => {
             query += ' WHERE ' + conditions.join(' AND ');
         }
 
-
         if (order) {
             if (order.toLowerCase() === 'time') {
                 query += ' order by r.time'
@@ -63,49 +61,21 @@ router.get("/", async (req, res) => {
         query += ' limit ' + ((page - 1) * PAGINATION_SIZE) + ',' + PAGINATION_SIZE
         const [rows] = await pool.query(query, values);
 
-        const resultsMap = {};
-        rows.forEach(row => {
-            if (!resultsMap[row.id]) {
-                resultsMap[row.id] = {
-                    id: row.id,
-                    time: row.time,
-                    pos_starter: row.pos_starter,
-                    pos_finisher: row.pos_finisher,
-                    racer: {
-                        id: row.racer_id,
-                        name: row.racer_name,
-                        age: row.racer_age,
-                        country: row.racer_country
-                    },
-                    manufacturer: {
-                        id: row.manufacturer_id,
-                        name: row.manufacturer_name,
-                        country: row.manufacturer_country
-                    },
-                    race: {
-                        id: row.race_id,
-                        date_start: row.race_date_start,
-                        track: {
-                            id: row.track_id,
-                            name: row.track_name,
-                            country: row.track_country,
-                            length: row.track_length
-                        }
-                    },
-                    laps: []
-                };
+        const results = await Promise.all(rows.map(async row => {
+            if (row.id) {
+                const [laps] = await pool.query("SELECT * FROM laps WHERE result_id=?", [row.id]);
+                return {
+                    ...row,
+                    laps: laps.map(lap => ({
+                        id: lap.id,
+                        time: lap.time,
+                        pos: lap.pos
+                    })),
+                }
             }
+        }));
 
-            if (row.lap_id) {
-                resultsMap[row.id].laps.push({
-                    id: row.lap_id,
-                    time: row.lap_time,
-                    pos: row.lap_pos
-                });
-            }
-        });
-
-        res.json(Object.values(resultsMap));
+        res.json(results);
     } catch (error) {
         console.error(error);
         res.status(500).send("Server error");
