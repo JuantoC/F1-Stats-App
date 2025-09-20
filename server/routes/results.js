@@ -13,7 +13,7 @@ router.get("/:id", async (req, res) => {
                 rm.id AS manufacturer_id, rm.name AS manufacturer_name, rm.country AS manufacturer_country,
                 ra.id AS race_id, ra.date_start AS race_date_start,
                 t.id AS track_id, t.name AS track_name, t.country AS track_country, t.length AS track_length
-            FROM results r
+            FROM results r 
             LEFT JOIN car_racers rc ON r.car_racer_id = rc.id
             LEFT JOIN car_manufacturer rm ON r.car_manufacturer_id = rm.id
             LEFT JOIN races ra ON r.race_id = ra.id

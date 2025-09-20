@@ -17,7 +17,7 @@ function ResultsList() {
   }, [])
   return (
     <ol>
-      {list.map((curr) => (<li key={curr.id}>By {curr.car_manufacturer_id}, {curr.age} age, {curr.country}</li>))}
+      {list.map((curr) => (<li key={curr.id}> {curr.car_racer} By {curr.car_manufacturer_id}, {curr.age} años, {curr.country}</li>))}
     </ol>
   )
 }
