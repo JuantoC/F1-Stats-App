@@ -1,6 +1,10 @@
 import request from "supertest";
-import { app } from "../index.js";
+import { app, server } from "../index.js";
 import descaleArray from "../helpers/arrayDescaler.js";
+
+afterAll((done) => {
+  server.close(done);
+});
 
 describe("Test Helpers", () => {
   it("Descale array", () => {
