@@ -2,7 +2,7 @@ import express from "express";
 import pool from "../helpers/db.js";
 
 const router = express.Router();
-const PAGINATION_SIZE = 5;
+const PAGINATION_SIZE = 3;
 
 router.get("/:id", async (req, res) => {
     try {

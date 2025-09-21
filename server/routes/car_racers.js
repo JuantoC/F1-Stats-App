@@ -2,11 +2,12 @@ import express from "express";
 import pool from "../helpers/db.js";
 
 const router = express.Router();
+const PAGINATION_SIZE = 3;
 
 router.get("/", async (req, res) => {
     try {
         let query = "SELECT * FROM car_racers";
-        const { id, name, country } = req.query;
+        const { id, name, country, page } = req.query;
         const conditions = [];
         const values = [];
 
@@ -15,6 +16,7 @@ router.get("/", async (req, res) => {
         if (country) { conditions.push("country = ?"); values.push(country); }
 
         if (conditions.length > 0) query += " WHERE " + conditions.join(" AND ");
+        if(page) query += ' limit ' + ((page - 1) * PAGINATION_SIZE) + ',' + PAGINATION_SIZE
 
         const [rows] = await pool.query(query, values);
         res.json(rows);

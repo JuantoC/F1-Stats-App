@@ -7,6 +7,7 @@ import ResultsList from './ListResults'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [showRacers, setShowRacers] = useState(false)
 
   const getCounterLabel = (num) => {
     if (num === 1) return `${num}st`;
@@ -16,28 +17,44 @@ function App() {
   };
 
   const counter = getCounterLabel(count + 1);
+  const handleRacersClick = () => {
+    setCount((prev) => prev + 1);
+    setShowRacers(true);
+  };
   return (
+
+
     //imgs
     <>
       <div>
         <a href="https://www.felipelecot.com/" target="_blank">
           <img src="https://imgs.search.brave.com/gN2IWLnVa4u0-Rpr2rh_fDIBlSwDO3YXcJkcwfJ70SY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nbWFydC5jb20v/ZmlsZXMvMjMvRjEt/TG9nby1QTkctUGhv/dG9zLnBuZw"
-            className="logo" alt="Vite logo" style={{ transform: `rotate(${count * 30}deg)` }} />
+            className="logo" alt="Vite logo" 
+            style={{ transform: `rotate(${count * 30}deg)` }} />
         </a>
         <a href="https://www.felipelecot.com/" target="_blank">
           <img src="https://imgs.search.brave.com/NwUOcikn9_BuZPatFkzhurOz5NPJNmy5BYmh4sbXpHA/rs:fit:860:0:0:0/g:ce/aHR0cDovL3R5cmUt/YXNzZXRzLnBpcmVs/bGkuY29tL3N0YXRp/Y2ZvbGRlci9UeXJl/L3Jlc291cmNlcy9p/bWcveWVsbG93LXBh/cmVudGVzaS5wbmc"
-            className="logo react" alt="React logo" />
+            className="logo react" 
+            alt="React logo" />
         </a>
       </div>
 
-      <h2>Racers</h2>
       <div className="card">
+        <button onClick={handleRacersClick}>
+          Racers
+        </button>
+      </div>
+      <div className="card">
+        {showRacers && <CarRacersList page={count} />}
+      </div>
+
+      {/* <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           {counter} page
         </button>
         <CarRacersList limit={count} />
 
-      </div>
+      </div> */}
     </>
   )
 }

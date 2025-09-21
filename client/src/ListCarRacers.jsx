@@ -6,10 +6,11 @@ import axios from 'axios';
 
 function CarRacersList(props) {
   const [list, setlist] = useState([])
+  
 
   useEffect(() => {
     const getResults = async () => {
-      const result = await axios.get('http://localhost:3000/car_racers')
+      const result = await axios.get('http://localhost:3000/car_racers?page='+props.page)
       setlist([...list, ...result.data])
     }
     getResults()

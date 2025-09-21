@@ -61,6 +61,18 @@ const f1Data = {
   ]
 };
 
+const moreCarRacers = [
+  { id: 5, name: "Fernando Alonso", age: 42, country: "España" },
+  { id: 6, name: "Sebastian Vettel", age: 36, country: "Alemania" },
+  { id: 7, name: "Valtteri Bottas", age: 33, country: "Finlandia" },
+  { id: 8, name: "George Russell", age: 26, country: "Reino Unido" },
+  { id: 9, name: "Lando Norris", age: 25, country: "Reino Unido" },
+  { id: 10, name: "Daniel Ricciardo", age: 34, country: "Australia" }
+];
+
+// Para insertarlos:
+await insterCarRacersData(moreCarRacers);
+
 async function insterTrackData(tracks){
     for (const track of tracks){
         await connection.execute(`insert into tracks (id, country, name, length) values (${track.id},'${track.country}','${track.name}','${track.length}')`)
