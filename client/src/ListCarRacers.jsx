@@ -16,7 +16,6 @@ function CarRacersList(props) {
   }, [])
   return (
     <ol>
-      {props.limit}
       {list.map((curr) => (<li key={curr.id}>{curr.name} {curr.age} years old, from {curr.country}.</li>))}
     </ol>
   )
